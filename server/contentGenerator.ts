@@ -100,19 +100,30 @@ Return ONLY valid JSON in this exact format:
 }
 
 Minigame types and their data structures:
-- text-construction: { question: string, words: string[], correctOrder: string[] }
-- matching: { pairs: [{ left: string, right: string, correctMatch: boolean }] } - IMPORTANT: Each pair must have left, right, and correctMatch fields
-- dialogue-choice: { scenario: string, dialogue: string, options: string[], correctAnswers: number[], feedback: string[] }
-- pronunciation-practice: { targetPhrase: string, missionId: string }
 
-Example matching game data:
-{
-  "pairs": [
-    { "left": "Morning", "right": "Good morning", "correctMatch": true },
-    { "left": "Afternoon", "right": "Good afternoon", "correctMatch": true },
-    { "left": "Evening", "right": "Good evening", "correctMatch": true }
-  ]
-}`;
+1. text-construction: { question: string, words: string[], correctOrder: string[] }
+   Example:
+   {
+     "question": "Build the sentence: 'How are you?'",
+     "words": ["you", "How", "?", "are"],
+     "correctOrder": ["How", "are", "you", "?"]
+   }
+
+2. matching: { pairs: [{ left: string, right: string, correctMatch: boolean }] }
+   Example:
+   {
+     "pairs": [
+       { "left": "Morning", "right": "Good morning", "correctMatch": true },
+       { "left": "Afternoon", "right": "Good afternoon", "correctMatch": true },
+       { "left": "Evening", "right": "Good evening", "correctMatch": true }
+     ]
+   }
+
+3. dialogue-choice: { scenario: string, dialogue: string, options: string[], correctAnswers: number[], feedback: string[] }
+
+4. pronunciation-practice: { targetPhrase: string, missionId: string }
+
+IMPORTANT: Always include the 'words' array in text-construction minigames!`;
 
   const response = await invokeLLM({
     messages: [
@@ -183,8 +194,29 @@ Example matching game data:
 
   const parsedContent: GeneratedMissionContent = JSON.parse(content);
   
-  // Post-process: Fix matching games with invalid structure
+  // Post-process: Fix minigames with invalid structure
   parsedContent.blocks.forEach(block => {
+    // Fix text-construction games
+    if (block.minigame && block.minigame.type === 'text-construction') {
+      if (!block.minigame.data.words || !Array.isArray(block.minigame.data.words) || block.minigame.data.words.length === 0) {
+        // Extract words from question or create default
+        const question = block.minigame.data.question || "How are you?";
+        // Create words array from correctOrder if available, otherwise from question
+        if (block.minigame.data.correctOrder && Array.isArray(block.minigame.data.correctOrder)) {
+          block.minigame.data.words = [...block.minigame.data.correctOrder].sort(() => Math.random() - 0.5);
+        } else {
+          // Default fallback for "How are you?"
+          block.minigame.data.words = ["you", "How", "?", "are"];
+          block.minigame.data.correctOrder = ["How", "are", "you", "?"];
+        }
+      }
+      // Ensure correctOrder exists
+      if (!block.minigame.data.correctOrder || !Array.isArray(block.minigame.data.correctOrder)) {
+        block.minigame.data.correctOrder = [...block.minigame.data.words];
+      }
+    }
+    
+    // Fix matching games
     if (block.minigame && block.minigame.type === 'matching') {
       // Check if pairs array exists and has valid structure
       if (!block.minigame.data.pairs || !Array.isArray(block.minigame.data.pairs)) {

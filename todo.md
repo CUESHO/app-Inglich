@@ -247,3 +247,18 @@
 - [x] Show "Back to Missions" button when user scrolls up
 - [x] Add smooth transition animations for show/hide
 - [x] Ensure button remains accessible on mobile devices
+
+
+## Bug Reportado - Iteración 10
+
+### Text-Construction Minigame Error
+- [x] Fix "Invalid minigame data for text-construction game" error
+- [x] Verify contentGenerator creates correct structure for text-construction minigames
+- [x] Ensure minigame.data.words array is properly generated
+- [x] Add automatic validation and correction for malformed text-construction data
+- [x] Test text-construction minigame rendering with new validation
+
+### Visibility Issues with Light Backgrounds
+- [x] Fix text visibility on light pink/red backgrounds (error messages, feedback)
+- [x] Ensure sufficient color contrast for all text elements
+- [x] Update feedback message styling for better readability

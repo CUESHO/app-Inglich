@@ -504,9 +504,9 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
   if (minigame.type === "matching") {
     if (!minigame.data || !minigame.data.pairs || !Array.isArray(minigame.data.pairs) || minigame.data.pairs.length === 0) {
       return (
-        <div className="p-4 bg-red-100 rounded-lg">
-          <p className="text-red-800">Error: Invalid minigame data for matching game</p>
-          <p className="text-sm text-red-600 mt-2">Expected structure: pairs array with left, right, correctMatch fields</p>
+        <div className="p-4 bg-red-900/20 border border-red-500 rounded-lg">
+          <p className="text-red-400 font-semibold">Error: Invalid minigame data for matching game</p>
+          <p className="text-sm text-red-300 mt-2">Expected structure: pairs array with left, right, correctMatch fields</p>
         </div>
       );
     }
@@ -516,9 +516,9 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
     );
     if (!isValid) {
       return (
-        <div className="p-4 bg-red-100 rounded-lg">
-          <p className="text-red-800">Error: Invalid pair structure in matching game</p>
-          <p className="text-sm text-red-600 mt-2">Each pair must have 'left' and 'right' string fields</p>
+        <div className="p-4 bg-red-900/20 border border-red-500 rounded-lg">
+          <p className="text-red-400 font-semibold">Error: Invalid pair structure in matching game</p>
+          <p className="text-sm text-red-300 mt-2">Each pair must have 'left' and 'right' string fields</p>
         </div>
       );
     }
@@ -546,9 +546,9 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
             {translations.submit}
           </Button>
         ) : (
-          <div className={`p-4 rounded-lg ${isCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
-            <p className="font-bold">{isCorrect ? translations.correct : translations.incorrect}</p>
-            <p className="text-sm">+{minigame.xpReward} {translations.xpEarned}</p>
+          <div className={`p-4 rounded-lg border ${isCorrect ? 'bg-green-900/20 border-green-500' : 'bg-red-900/20 border-red-500'}`}>
+            <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>{isCorrect ? translations.correct : translations.incorrect}</p>
+            <p className={`text-sm ${isCorrect ? 'text-green-300' : 'text-red-300'}`}>+{minigame.xpReward} {translations.xpEarned}</p>
           </div>
         )}
       </div>
@@ -558,8 +558,8 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
   if (minigame.type === "text-construction") {
     if (!minigame.data || !minigame.data.words || !Array.isArray(minigame.data.words)) {
       return (
-        <div className="p-4 bg-red-100 rounded-lg">
-          <p className="text-red-800">Error: Invalid minigame data for text-construction game</p>
+        <div className="p-4 bg-red-900/20 border border-red-500 rounded-lg">
+          <p className="text-red-400 font-semibold">Error: Invalid minigame data for text-construction game</p>
         </div>
       );
     }
@@ -586,8 +586,8 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
   if (minigame.type === "dialogue-choice") {
     if (!minigame.data || !minigame.data.options || !Array.isArray(minigame.data.options)) {
       return (
-        <div className="p-4 bg-red-100 rounded-lg">
-          <p className="text-red-800">Error: Invalid minigame data for dialogue-choice game</p>
+        <div className="p-4 bg-red-900/20 border border-red-500 rounded-lg">
+          <p className="text-red-400 font-semibold">Error: Invalid minigame data for dialogue-choice game</p>
         </div>
       );
     }
@@ -622,10 +622,10 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
           ))}
         </div>
         {isCorrect !== null && (
-          <div className={`p-4 rounded-lg ${isCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
-            <p className="font-bold">{isCorrect ? translations.correct : translations.incorrect}</p>
-            <p className="text-sm mt-2">{minigame.data.feedback[userAnswer]}</p>
-            <p className="text-sm font-bold mt-2">+{minigame.xpReward} {translations.xpEarned}</p>
+          <div className={`p-4 rounded-lg border ${isCorrect ? 'bg-green-900/20 border-green-500' : 'bg-red-900/20 border-red-500'}`}>
+            <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>{isCorrect ? translations.correct : translations.incorrect}</p>
+            <p className={`text-sm mt-2 ${isCorrect ? 'text-green-300' : 'text-red-300'}`}>{minigame.data.feedback[userAnswer]}</p>
+            <p className={`text-sm font-bold mt-2 ${isCorrect ? 'text-green-300' : 'text-red-300'}`}>+{minigame.xpReward} {translations.xpEarned}</p>
           </div>
         )}
       </div>
@@ -635,8 +635,8 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
   if (minigame.type === "pronunciation-practice") {
     if (!minigame.data || !minigame.data.targetPhrase) {
       return (
-        <div className="p-4 bg-red-100 rounded-lg">
-          <p className="text-red-800">Error: Invalid minigame data for pronunciation-practice</p>
+        <div className="p-4 bg-red-900/20 border border-red-500 rounded-lg">
+          <p className="text-red-400 font-semibold">Error: Invalid minigame data for pronunciation-practice</p>
         </div>
       );
     }
@@ -738,17 +738,21 @@ function QuizRenderer({ questions, worldColor, translations, onAnswer }: any) {
           </div>
 
           {isAnswered && (
-            <div className={`mt-4 p-4 rounded-lg ${
-              selectedAnswer === currentQuestion.correctAnswer ? 'bg-green-100' : 'bg-red-100'
+            <div className={`mt-4 p-4 rounded-lg border ${
+              selectedAnswer === currentQuestion.correctAnswer ? 'bg-green-900/20 border-green-500' : 'bg-red-900/20 border-red-500'
             }`}>
-              <p className="font-bold mb-2">
+              <p className={`font-bold mb-2 ${
+                selectedAnswer === currentQuestion.correctAnswer ? 'text-green-400' : 'text-red-400'
+              }`}>
                 {selectedAnswer === currentQuestion.correctAnswer ? translations.correct : translations.incorrect}
               </p>
-              <p className="text-sm">
+              <p className={`text-sm ${
+                selectedAnswer === currentQuestion.correctAnswer ? 'text-green-300' : 'text-red-300'
+              }`}>
                 <strong>{translations.explanation}:</strong> {currentQuestion.explanation}
               </p>
               {selectedAnswer === currentQuestion.correctAnswer && (
-                <p className="text-sm font-bold mt-2">+{currentQuestion.xpReward} XP</p>
+                <p className="text-sm font-bold mt-2 text-green-300">+{currentQuestion.xpReward} XP</p>
               )}
             </div>
           )}
@@ -773,9 +777,9 @@ function QuizRenderer({ questions, worldColor, translations, onAnswer }: any) {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <div className="w-full text-center p-4 bg-green-100 rounded-lg">
-                <p className="font-bold text-lg">Quiz Completed!</p>
-                <p className="text-sm">Total Score: {score} XP</p>
+              <div className="w-full text-center p-4 bg-green-900/20 border border-green-500 rounded-lg">
+                <p className="font-bold text-lg text-green-400">Quiz Completed!</p>
+                <p className="text-sm text-green-300">Total Score: {score} XP</p>
               </div>
             )}
           </div>
