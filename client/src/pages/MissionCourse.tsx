@@ -11,6 +11,8 @@ import { ArrowLeft, ArrowRight, Trophy, Zap, Clock, BookOpen, Gamepad2 } from "l
 import { useState } from "react";
 import { Streamdown } from "streamdown";
 import TextConstructionGame from "@/components/TextConstructionGame";
+import VoicePracticeRecorder from "@/components/VoicePracticeRecorder";
+import { trpc } from "@/lib/trpc";
 
 export default function MissionCourse() {
   const { missionId } = useParams<{ missionId: string }>();
@@ -21,7 +23,35 @@ export default function MissionCourse() {
 
   const mission = missionId ? getMissionById(missionId) : undefined;
   const world = mission ? getWorldById(mission.worldId) : undefined;
-  const course = missionId ? getCourseByMissionId(missionId) : undefined;
+  
+  // Generate course content dynamically using AI
+  const generateContent = trpc.content.generateMissionContent.useMutation();
+  const [course, setCourse] = useState<any>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Generate content when mission loads
+  useState(() => {
+    if (mission && world && !course && !isGenerating) {
+      setIsGenerating(true);
+      generateContent.mutateAsync({
+        missionId: mission.id,
+        worldId: world.id,
+        worldName: world.name,
+        worldTheme: world.description,
+        cefrLevel: world.cefrLevel,
+        missionTitle: mission.name,
+        missionObjective: mission.objective,
+      }).then((data: any) => {
+        setCourse(data);
+        setIsGenerating(false);
+      }).catch((error: any) => {
+        console.error('Failed to generate course:', error);
+        setIsGenerating(false);
+        // Fallback to static content
+        setCourse(getCourseByMissionId(missionId!));
+      });
+    }
+  });
 
   const translations = {
     en: {
@@ -434,6 +464,20 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
           </div>
         )}
       </div>
+    );
+  }
+
+  if (minigame.type === "pronunciation-practice") {
+    return (
+      <VoicePracticeRecorder
+        targetPhrase={minigame.data.targetPhrase}
+        missionId={minigame.data.missionId || "default"}
+        neonColor={worldColor}
+        onComplete={(score) => {
+          setIsCorrect(score >= 70);
+          console.log(`Pronunciation score: ${score}`);
+        }}
+      />
     );
   }
 

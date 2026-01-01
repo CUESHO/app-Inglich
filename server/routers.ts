@@ -119,6 +119,37 @@ Use encouraging language and game metaphors. Keep it to 1-2 sentences.`;
 
   // Pronunciation practice procedures
   pronunciation: router({
+    // Upload audio file to S3
+    uploadAudio: protectedProcedure
+      .input(z.object({
+        audioData: z.string(), // base64 encoded audio
+        missionId: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { audioData, missionId } = input;
+
+        try {
+          // Convert base64 to buffer
+          const base64Data = audioData.split(',')[1];
+          const buffer = Buffer.from(base64Data, 'base64');
+
+          // Upload to S3
+          const { storagePut } = await import('./storage');
+          const timestamp = Date.now();
+          const fileKey = `pronunciation/${ctx.user.id}/${missionId}-${timestamp}.webm`;
+          
+          const result = await storagePut(fileKey, buffer, 'audio/webm');
+
+          return {
+            audioUrl: result.url,
+            fileKey,
+          };
+        } catch (error) {
+          console.error('Error uploading audio:', error);
+          throw new Error('Failed to upload audio');
+        }
+      }),
+
     // Analyze pronunciation from audio
     analyzePronunciation: protectedProcedure
       .input(z.object({
@@ -281,6 +312,59 @@ Analyze the pronunciation and provide feedback.`;
       .query(async ({ ctx, input }) => {
         const { getCompletedMissions } = await import('./db');
         return await getCompletedMissions(ctx.user.id, input.worldId);
+      }),
+
+    unlockWorld: protectedProcedure
+      .input(z.object({
+        worldId: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { unlockWorld } = await import('./db');
+        await unlockWorld(ctx.user.id, input.worldId);
+        return { success: true };
+      }),
+  }),
+
+  // Content generation procedures
+  content: router({
+    generateMissionContent: protectedProcedure
+      .input(z.object({
+        missionId: z.string(),
+        worldId: z.string(),
+        worldName: z.string(),
+        worldTheme: z.string(),
+        cefrLevel: z.string(),
+        missionTitle: z.string(),
+        missionObjective: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { generateMissionContent } = await import('./contentGenerator');
+        return await generateMissionContent(
+          input.missionId,
+          input.worldId,
+          input.worldName,
+          input.worldTheme,
+          input.cefrLevel,
+          input.missionTitle,
+          input.missionObjective
+        );
+      }),
+
+    generateBossBattle: protectedProcedure
+      .input(z.object({
+        worldId: z.string(),
+        worldName: z.string(),
+        worldTheme: z.string(),
+        cefrLevel: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { generateBossBattle } = await import('./contentGenerator');
+        return await generateBossBattle(
+          input.worldId,
+          input.worldName,
+          input.worldTheme,
+          input.cefrLevel
+        );
       }),
   }),
 });

@@ -7,7 +7,8 @@ import { getLoginUrl } from "@/const";
 import { WORLDS } from "@shared/worlds";
 import { Link } from "wouter";
 import { Sparkles, Trophy, Zap, Globe, Lock, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -58,13 +59,27 @@ export default function Home() {
 
   const t = translations[language];
 
-  // Mock user progress data
-  const userLevel = 1;
-  const userXP = 0;
-  const userCoins = 0;
-  const userAchievements = 0;
+  // Load user progress from database
+  const { data: progressData, isLoading: progressLoading } = trpc.progress.getMyProgress.useQuery(
+    undefined,
+    { enabled: isAuthenticated }
+  );
+  const unlockWorld = trpc.progress.unlockWorld.useMutation();
+
+  // Auto-unlock Foundation Realm on first login
+  useEffect(() => {
+    if (isAuthenticated && progressData && !progressData.unlockedWorlds.includes('foundation-realm')) {
+      unlockWorld.mutate({ worldId: 'foundation-realm' });
+    }
+  }, [isAuthenticated, progressData]);
+
+  const userLevel = progressData?.level || 1;
+  const userXP = progressData?.totalXp || 0;
+  const userCoins = progressData?.coins || 0;
+  const userAchievements = progressData?.achievements || 0;
   const xpToNextLevel = 1000;
   const xpProgress = (userXP / xpToNextLevel) * 100;
+  const unlockedWorlds = progressData?.unlockedWorlds || ['foundation-realm'];
 
   if (loading) {
     return (
@@ -327,7 +342,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {WORLDS.map((world, index) => {
-              const isUnlocked = index === 0; // Only first world unlocked for now
+              const isUnlocked = unlockedWorlds.includes(world.id);
 
               return (
                 <Link key={world.id} href={isUnlocked ? `/world/${world.id}` : "#"}>
