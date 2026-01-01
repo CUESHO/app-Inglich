@@ -272,3 +272,27 @@
 - [x] Clear quiz answers when navigating to a new block
 - [x] Clear minigame state when navigating to a new block
 - [x] Test navigation flow: complete block 1 → go to block 2 → return to block 1 (should be reset)
+
+
+## Mejoras Solicitadas - Iteración 12
+
+### Interactive Minigames Implementation
+- [x] Implement drag-and-drop functionality for text-construction minigame
+  - [x] Add draggable word chips from Word Bank
+  - [x] Add drop zone for sentence construction
+  - [x] Show visual feedback during drag (hover states, drop indicators)
+  - [x] Validate sentence order against correctOrder
+  - [x] Show success/error feedback after submission
+- [x] Implement interactive selection for matching minigame
+  - [x] Allow users to click/tap to select pairs
+  - [x] Show visual feedback for selected items
+  - [x] Validate matches against correct pairs
+  - [x] Show success/error feedback after submission
+- [x] Implement interactive selection for dialogue-choice minigame (already implemented)
+  - [x] Make dialogue options clickable
+  - [x] Show visual feedback for selected option
+  - [x] Validate choice against correct answer
+  - [x] Show success/error feedback after selection
+- [x] Pronunciation-practice minigame already interactive with voice recording
+- [x] Test all minigames across different blocks and missions
+- [x] Ensure mobile-friendly touch interactions

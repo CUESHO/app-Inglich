@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, Trophy, Zap, Clock, BookOpen, Gamepad2 } from "l
 import { useState, useEffect } from "react";
 import { Streamdown } from "streamdown";
 import TextConstructionGame from "@/components/TextConstructionGame";
+import MatchingGame from "@/components/MatchingGame";
 import VoicePracticeRecorder from "@/components/VoicePracticeRecorder";
 import BlockCompletionChecklist from "@/components/BlockCompletionChecklist";
 import { trpc } from "@/lib/trpc";
@@ -529,35 +530,20 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
       );
     }
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          {minigame.data.pairs.map((pair: any, index: number) => (
-            <div key={index} className="flex items-center gap-2">
-              <Badge variant="outline" className="flex-1 justify-center py-2">
-                {pair.left}
-              </Badge>
-              <span>→</span>
-              <Badge variant="outline" className="flex-1 justify-center py-2">
-                {pair.right}
-              </Badge>
-            </div>
-          ))}
-        </div>
-        {isCorrect === null ? (
-          <Button 
-            onClick={handleSubmit}
-            className="w-full"
-            style={{ backgroundColor: worldColor, color: 'white' }}
-          >
-            {translations.submit}
-          </Button>
-        ) : (
-          <div className={`p-4 rounded-lg border ${isCorrect ? 'bg-green-900/20 border-green-500' : 'bg-red-900/20 border-red-500'}`}>
-            <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>{isCorrect ? translations.correct : translations.incorrect}</p>
-            <p className={`text-sm ${isCorrect ? 'text-green-300' : 'text-red-300'}`}>+{minigame.xpReward} {translations.xpEarned}</p>
-          </div>
-        )}
-      </div>
+      <MatchingGame
+        pairs={minigame.data.pairs}
+        neonColor={worldColor}
+        xpReward={minigame.xpReward}
+        onComplete={(isCorrect) => {
+          setIsCorrect(isCorrect);
+          if (isCorrect) {
+            console.log(`Awarded ${minigame.xpReward} XP`);
+            if (onComplete) {
+              onComplete();
+            }
+          }
+        }}
+      />
     );
   }
 
