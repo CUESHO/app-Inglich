@@ -513,6 +513,13 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
   }
 
   if (minigame.type === "pronunciation-practice") {
+    if (!minigame.data || !minigame.data.targetPhrase) {
+      return (
+        <div className="p-4 bg-red-100 rounded-lg">
+          <p className="text-red-800">Error: Invalid minigame data for pronunciation-practice</p>
+        </div>
+      );
+    }
     return (
       <VoicePracticeRecorder
         targetPhrase={minigame.data.targetPhrase}

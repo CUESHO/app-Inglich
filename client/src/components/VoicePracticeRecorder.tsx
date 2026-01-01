@@ -218,7 +218,7 @@ export default function VoicePracticeRecorder({
             "{targetPhrase}"
           </p>
           <p className="text-sm mt-2" style={{ color: `${neonColor}99` }}>
-            Pronunciation: {targetPhrase.split(' ').map(word => `[${word.toLowerCase()}]`).join(' ')}
+            Pronunciation: {targetPhrase ? targetPhrase.split(' ').map(word => `[${word.toLowerCase()}]`).join(' ') : 'N/A'}
           </p>
         </CardContent>
       </Card>
