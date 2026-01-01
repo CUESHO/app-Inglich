@@ -403,10 +403,23 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
   };
 
   if (minigame.type === "matching") {
-    if (!minigame.data || !minigame.data.pairs || !Array.isArray(minigame.data.pairs)) {
+    if (!minigame.data || !minigame.data.pairs || !Array.isArray(minigame.data.pairs) || minigame.data.pairs.length === 0) {
       return (
         <div className="p-4 bg-red-100 rounded-lg">
           <p className="text-red-800">Error: Invalid minigame data for matching game</p>
+          <p className="text-sm text-red-600 mt-2">Expected structure: pairs array with left, right, correctMatch fields</p>
+        </div>
+      );
+    }
+    // Validate each pair has required fields
+    const isValid = minigame.data.pairs.every((pair: any) => 
+      pair && typeof pair.left === 'string' && typeof pair.right === 'string'
+    );
+    if (!isValid) {
+      return (
+        <div className="p-4 bg-red-100 rounded-lg">
+          <p className="text-red-800">Error: Invalid pair structure in matching game</p>
+          <p className="text-sm text-red-600 mt-2">Each pair must have 'left' and 'right' string fields</p>
         </div>
       );
     }

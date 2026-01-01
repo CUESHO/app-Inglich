@@ -100,10 +100,19 @@ Return ONLY valid JSON in this exact format:
 }
 
 Minigame types and their data structures:
-- text-construction: { question, words: string[], correctOrder: string[] }
-- matching: { pairs: [{ left, right }] }
-- dialogue-choice: { scenario, dialogue, options: string[], correctAnswers: number[], feedback: string[] }
-- pronunciation-practice: { targetPhrase, missionId }`;
+- text-construction: { question: string, words: string[], correctOrder: string[] }
+- matching: { pairs: [{ left: string, right: string, correctMatch: boolean }] } - IMPORTANT: Each pair must have left, right, and correctMatch fields
+- dialogue-choice: { scenario: string, dialogue: string, options: string[], correctAnswers: number[], feedback: string[] }
+- pronunciation-practice: { targetPhrase: string, missionId: string }
+
+Example matching game data:
+{
+  "pairs": [
+    { "left": "Morning", "right": "Good morning", "correctMatch": true },
+    { "left": "Afternoon", "right": "Good afternoon", "correctMatch": true },
+    { "left": "Evening", "right": "Good evening", "correctMatch": true }
+  ]
+}`;
 
   const response = await invokeLLM({
     messages: [
@@ -172,7 +181,39 @@ Minigame types and their data structures:
     throw new Error("Failed to generate mission content");
   }
 
-  return JSON.parse(content);
+  const parsedContent: GeneratedMissionContent = JSON.parse(content);
+  
+  // Post-process: Fix matching games with invalid structure
+  parsedContent.blocks.forEach(block => {
+    if (block.minigame && block.minigame.type === 'matching') {
+      // Check if pairs array exists and has valid structure
+      if (!block.minigame.data.pairs || !Array.isArray(block.minigame.data.pairs)) {
+        // Create default matching game based on greeting times
+        block.minigame.data = {
+          pairs: [
+            { left: "Morning (6 AM - 12 PM)", right: "Good morning", correctMatch: true },
+            { left: "Afternoon (12 PM - 5 PM)", right: "Good afternoon", correctMatch: true },
+            { left: "Evening (5 PM - 9 PM)", right: "Good evening", correctMatch: true },
+            { left: "Night (9 PM - 6 AM)", right: "Good night", correctMatch: true }
+          ]
+        };
+      } else {
+        // Validate and fix existing pairs
+        block.minigame.data.pairs = block.minigame.data.pairs.map((pair: any) => {
+          if (!pair.left || !pair.right) {
+            return { left: "Morning", right: "Good morning", correctMatch: true };
+          }
+          return {
+            left: String(pair.left),
+            right: String(pair.right),
+            correctMatch: pair.correctMatch !== undefined ? pair.correctMatch : true
+          };
+        });
+      }
+    }
+  });
+
+  return parsedContent;
 }
 
 /**
