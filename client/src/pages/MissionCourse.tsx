@@ -102,15 +102,18 @@ export default function MissionCourse() {
 
   const t = translations[language];
 
+  // Get final course (generated or fallback)
+  const finalCourse = course || (missionId ? getCourseByMissionId(missionId) : null);
+
   const handleCompleteBlock = () => {
     setCompletedBlocks(prev => new Set(prev).add(currentBlockIndex));
-    if (currentBlockIndex < (course?.blocks.length || 0) - 1) {
+    if (finalCourse && currentBlockIndex < finalCourse.blocks.length - 1) {
       setCurrentBlockIndex(currentBlockIndex + 1);
     }
   };
 
   const handleNextBlock = () => {
-    if (currentBlockIndex < (course?.blocks.length || 0) - 1) {
+    if (finalCourse && currentBlockIndex < finalCourse.blocks.length - 1) {
       setCurrentBlockIndex(currentBlockIndex + 1);
     }
   };
@@ -121,29 +124,50 @@ export default function MissionCourse() {
     }
   };
 
-  if (loading) {
+  if (loading || isGenerating) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%)' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 mx-auto mb-4" style={{ borderColor: '#00D9FF' }}></div>
+          <p className="text-xl" style={{ color: '#B026FF' }}>
+            {isGenerating ? (language === 'en' ? 'Generating course content...' : 'Generando contenido del curso...') : (language === 'en' ? 'Loading...' : 'Cargando...')}
+          </p>
+        </div>
       </div>
     );
   }
 
-  if (!mission || !world || !course) {
+  if (!mission || !world) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%)' }}>
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Mission Not Found</h1>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: '#00D9FF' }}>Mission Not Found</h1>
           <Link href="/">
-            <Button>Back to Home</Button>
+            <Button style={{ background: '#B026FF', color: 'white' }}>Back to Home</Button>
           </Link>
         </div>
       </div>
     );
   }
 
-  const currentBlock = course.blocks[currentBlockIndex];
-  const progressPercentage = ((completedBlocks.size / course.blocks.length) * 100);
+  // finalCourse is already declared above
+  
+  if (!finalCourse || !finalCourse.blocks || finalCourse.blocks.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%)' }}>
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4" style={{ color: '#FF0080' }}>Course Content Not Available</h1>
+          <p className="mb-4" style={{ color: '#B026FF' }}>Unable to load course content for this mission.</p>
+          <Link href={`/world/${world.id}`}>
+            <Button style={{ background: '#B026FF', color: 'white' }}>Back to Missions</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const currentBlock = finalCourse.blocks[currentBlockIndex];
+  const progressPercentage = ((completedBlocks.size / finalCourse.blocks.length) * 100);
 
   return (
     <div 
@@ -204,14 +228,14 @@ export default function MissionCourse() {
               <Clock className="w-5 h-5 text-gray-600" />
               <div>
                 <p className="text-xs text-gray-600">{t.estimatedTime}</p>
-                <p className="text-sm font-bold text-gray-800">{course.estimatedTime} {t.minutes}</p>
+                <p className="text-sm font-bold text-gray-800">{finalCourse.estimatedTime} {t.minutes}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-gray-600" />
               <div>
                 <p className="text-xs text-gray-600">{t.blocks}</p>
-                <p className="text-sm font-bold text-gray-800">{completedBlocks.size} / {course.blocks.length}</p>
+                <p className="text-sm font-bold text-gray-800">{completedBlocks.size} / {finalCourse.blocks.length}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -254,7 +278,7 @@ export default function MissionCourse() {
                   variant="secondary"
                   style={{ backgroundColor: world.color, color: 'white' }}
                 >
-                  {currentBlockIndex + 1} / {course.blocks.length}
+                  {currentBlockIndex + 1} / {finalCourse.blocks.length}
                 </Badge>
               </div>
             </CardHeader>
@@ -335,7 +359,7 @@ export default function MissionCourse() {
             </Button>
 
             {completedBlocks.has(currentBlockIndex) ? (
-              currentBlockIndex < course.blocks.length - 1 ? (
+              currentBlockIndex < finalCourse.blocks.length - 1 ? (
                 <Button
                   onClick={handleNextBlock}
                   style={{ backgroundColor: world.color, color: 'white' }}
@@ -379,6 +403,13 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
   };
 
   if (minigame.type === "matching") {
+    if (!minigame.data || !minigame.data.pairs || !Array.isArray(minigame.data.pairs)) {
+      return (
+        <div className="p-4 bg-red-100 rounded-lg">
+          <p className="text-red-800">Error: Invalid minigame data for matching game</p>
+        </div>
+      );
+    }
     return (
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -412,6 +443,13 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
   }
 
   if (minigame.type === "text-construction") {
+    if (!minigame.data || !minigame.data.words || !Array.isArray(minigame.data.words)) {
+      return (
+        <div className="p-4 bg-red-100 rounded-lg">
+          <p className="text-red-800">Error: Invalid minigame data for text-construction game</p>
+        </div>
+      );
+    }
     return (
       <TextConstructionGame
         question={minigame.data.question}
@@ -430,6 +468,13 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
   }
 
   if (minigame.type === "dialogue-choice") {
+    if (!minigame.data || !minigame.data.options || !Array.isArray(minigame.data.options)) {
+      return (
+        <div className="p-4 bg-red-100 rounded-lg">
+          <p className="text-red-800">Error: Invalid minigame data for dialogue-choice game</p>
+        </div>
+      );
+    }
     return (
       <div className="space-y-4">
         <Card className="bg-gray-100">

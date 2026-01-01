@@ -197,3 +197,12 @@
 - [ ] Integrate push notifications for reminders (requires notification API setup)
 - [x] Create streak recovery system (grace period)
 - [ ] Add streak leaderboard (future enhancement)
+
+
+## Bug Fixes - Iteración 6
+
+### MinigameRenderer Error Fix
+- [x] Identify the source of "Cannot read properties of undefined (reading 'map')" error
+- [x] Add proper validation for minigame data in MissionCourse.tsx
+- [x] Add fallback UI for missing or invalid minigame data
+- [x] Test all minigame types to ensure they load correctly
