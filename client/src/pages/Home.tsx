@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { getLoginUrl } from "@/const";
 import { WORLDS } from "@shared/worlds";
 import { Link } from "wouter";
-import { Sparkles, Trophy, Zap, Globe } from "lucide-react";
+import { Sparkles, Trophy, Zap, Globe, Lock, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -19,6 +19,7 @@ export default function Home() {
       subtitle: "Transform Your English Learning Into An Epic Adventure!",
       description: "Embark on a gamified journey through 8 magical worlds. Master English from A1 to C2 with interactive missions, minigames, and boss battles!",
       selectWorld: "Select Your World",
+      chooseAdventure: "Choose your adventure and start mastering English through epic quests and challenges!",
       login: "Start Your Adventure",
       yourProgress: "Your Progress",
       level: "Level",
@@ -30,12 +31,15 @@ export default function Home() {
       locked: "Locked",
       unlocked: "Unlocked",
       comingSoon: "Coming Soon",
+      welcomeBack: "Welcome back",
+      progressToLevel: "Progress to Level",
     },
     es: {
       title: "Inglich 1, 2 x 3",
       subtitle: "¡Transforma tu Aprendizaje de Inglés en una Aventura Épica!",
       description: "Embárcate en un viaje gamificado a través de 8 mundos mágicos. Domina el inglés desde A1 hasta C2 con misiones interactivas, minijuegos y jefes finales!",
       selectWorld: "Selecciona Tu Mundo",
+      chooseAdventure: "¡Elige tu aventura y comienza a dominar el inglés a través de misiones épicas y desafíos!",
       login: "Comienza Tu Aventura",
       yourProgress: "Tu Progreso",
       level: "Nivel",
@@ -47,45 +51,87 @@ export default function Home() {
       locked: "Bloqueado",
       unlocked: "Desbloqueado",
       comingSoon: "Próximamente",
+      welcomeBack: "Bienvenido de nuevo",
+      progressToLevel: "Progreso al Nivel",
     },
   };
 
   const t = translations[language];
 
+  // Mock user progress data
+  const userLevel = 1;
+  const userXP = 0;
+  const userCoins = 0;
+  const userAchievements = 0;
+  const xpToNextLevel = 1000;
+  const xpProgress = (userXP / xpToNextLevel) * 100;
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+      <div 
+        className="min-h-screen flex items-center justify-center cyber-grid" 
+        style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%)' }}
+      >
+        <div 
+          className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4" 
+          style={{ borderColor: '#00D9FF', boxShadow: '0 0 20px #00D9FF' }}
+        ></div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+      <div 
+        className="min-h-screen flex flex-col items-center justify-center cyber-grid p-4" 
+        style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%)' }}
+      >
         <div className="text-center max-w-4xl mx-auto space-y-8 animate-float">
           <div className="space-y-4">
-            <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 
+              className="text-6xl md:text-7xl font-black neon-text" 
+              style={{ color: '#00D9FF', textShadow: '0 0 20px #00D9FF, 0 0 40px #00D9FF' }}
+            >
               {t.title}
             </h1>
-            <p className="text-2xl md:text-3xl font-bold text-gray-700">
+            <p 
+              className="text-2xl md:text-3xl font-bold" 
+              style={{ color: '#FF0080', textShadow: '0 0 10px #FF0080' }}
+            >
               {t.subtitle}
             </p>
-            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+            <p 
+              className="text-lg md:text-xl max-w-2xl mx-auto" 
+              style={{ color: '#B026FF' }}
+            >
               {t.description}
             </p>
           </div>
 
           <div className="flex gap-4 items-center justify-center">
-            <Sparkles className="w-12 h-12 text-yellow-500 animate-pulse" />
-            <Trophy className="w-12 h-12 text-purple-500 animate-pulse" />
-            <Zap className="w-12 h-12 text-blue-500 animate-pulse" />
+            <Sparkles 
+              className="w-12 h-12 animate-pulse" 
+              style={{ color: '#FFD700', filter: 'drop-shadow(0 0 10px #FFD700)' }} 
+            />
+            <Trophy 
+              className="w-12 h-12 animate-pulse" 
+              style={{ color: '#B026FF', filter: 'drop-shadow(0 0 10px #B026FF)' }} 
+            />
+            <Zap 
+              className="w-12 h-12 animate-pulse" 
+              style={{ color: '#00D9FF', filter: 'drop-shadow(0 0 10px #00D9FF)' }} 
+            />
           </div>
 
           <div className="space-y-4">
             <Button
               size="lg"
-              className="game-button bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xl px-8 py-6"
+              className="game-button text-xl px-8 py-6 font-bold"
+              style={{ 
+                background: 'linear-gradient(135deg, #00D9FF 0%, #B026FF 100%)', 
+                color: '#0a0a1a', 
+                boxShadow: '0 0 20px #00D9FF, 0 0 40px #B026FF' 
+              }}
               onClick={() => window.location.href = getLoginUrl()}
             >
               <Sparkles className="mr-2 h-6 w-6" />
@@ -97,42 +143,52 @@ export default function Home() {
                 variant="outline"
                 size="sm"
                 onClick={() => setLanguage("en")}
-                className={language === "en" ? "bg-primary text-primary-foreground" : ""}
+                style={{
+                  background: language === "en" ? '#00D9FF' : 'transparent',
+                  color: language === "en" ? '#0a0a1a' : '#00D9FF',
+                  borderColor: '#00D9FF',
+                  boxShadow: language === "en" ? '0 0 15px #00D9FF' : 'none'
+                }}
               >
-                🇬🇧 English
+                🇺🇸 English
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setLanguage("es")}
-                className={language === "es" ? "bg-primary text-primary-foreground" : ""}
+                style={{
+                  background: language === "es" ? '#FF0080' : 'transparent',
+                  color: language === "es" ? '#0a0a1a' : '#FF0080',
+                  borderColor: '#FF0080',
+                  boxShadow: language === "es" ? '0 0 15px #FF0080' : 'none'
+                }}
               >
-                🇪🇸 Español
+                🇲🇽 Español
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-md">
-              <Globe className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-              <p className="text-2xl font-bold text-gray-800">8</p>
-              <p className="text-sm text-gray-600">{t.worlds}</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-md">
-              <Zap className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-              <p className="text-2xl font-bold text-gray-800">80</p>
-              <p className="text-sm text-gray-600">{t.missions}</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-md">
-              <Trophy className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
-              <p className="text-2xl font-bold text-gray-800">50+</p>
-              <p className="text-sm text-gray-600">{t.achievements}</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-md">
-              <Sparkles className="w-8 h-8 mx-auto mb-2 text-pink-600" />
-              <p className="text-2xl font-bold text-gray-800">A1-C2</p>
-              <p className="text-sm text-gray-600">CEFR</p>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            {[
+              { icon: Globe, value: "8", label: t.worlds, color: '#00D9FF' },
+              { icon: Trophy, value: "80", label: t.missions, color: '#FF0080' },
+              { icon: Sparkles, value: "∞", label: "Minigames", color: '#FFD700' },
+              { icon: Zap, value: "AI", label: "Tutor", color: '#B026FF' },
+            ].map((stat, index) => (
+              <div 
+                key={index}
+                className="backdrop-blur-sm rounded-lg p-4 shadow-md" 
+                style={{ 
+                  background: `rgba(${parseInt(stat.color.slice(1, 3), 16)}, ${parseInt(stat.color.slice(3, 5), 16)}, ${parseInt(stat.color.slice(5, 7), 16)}, 0.1)`, 
+                  border: `1px solid ${stat.color}`, 
+                  boxShadow: `0 0 15px ${stat.color}40` 
+                }}
+              >
+                <stat.icon className="w-8 h-8 mx-auto mb-2" style={{ color: stat.color }} />
+                <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
+                <p className="text-sm" style={{ color: `${stat.color}CC` }}>{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -140,199 +196,213 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* Header with User Stats */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container py-4">
+    <div 
+      className="min-h-screen cyber-grid" 
+      style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%)' }}
+    >
+      {/* Header */}
+      <header 
+        className="sticky top-0 z-50 backdrop-blur-lg border-b" 
+        style={{ 
+          background: 'rgba(10, 10, 26, 0.9)', 
+          borderColor: '#00D9FF40',
+          boxShadow: '0 0 20px rgba(0, 217, 255, 0.2)'
+        }}
+      >
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {t.title}
-              </h1>
-              <p className="text-sm text-gray-600">Welcome back, {user?.name}! 🎮</p>
+            <h1 
+              className="text-3xl font-black neon-text" 
+              style={{ color: '#00D9FF', textShadow: '0 0 10px #00D9FF' }}
+            >
+              {t.title}
+            </h1>
+            <div className="flex items-center gap-4">
+              <span style={{ color: '#B026FF' }}>
+                {t.welcomeBack}, <strong style={{ color: '#00D9FF' }}>{user?.name}</strong>
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLanguage("en")}
+                  style={{
+                    background: language === "en" ? '#00D9FF20' : 'transparent',
+                    color: language === "en" ? '#00D9FF' : '#666',
+                    border: language === "en" ? '1px solid #00D9FF' : 'none'
+                  }}
+                >
+                  🇺🇸
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLanguage("es")}
+                  style={{
+                    background: language === "es" ? '#FF008020' : 'transparent',
+                    color: language === "es" ? '#FF0080' : '#666',
+                    border: language === "es" ? '1px solid #FF0080' : 'none'
+                  }}
+                >
+                  🇲🇽
+                </Button>
+              </div>
             </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setLanguage("en")}
-                className={language === "en" ? "bg-primary text-primary-foreground" : ""}
-              >
-                🇬🇧
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setLanguage("es")}
-                className={language === "es" ? "bg-primary text-primary-foreground" : ""}
-              >
-                🇪🇸
-              </Button>
-            </div>
-          </div>
-
-          {/* User Progress Bar */}
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-br from-blue-100 to-blue-200">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-blue-600" />
-                  <div className="flex-1">
-                    <p className="text-xs text-gray-600">{t.level}</p>
-                    <p className="text-2xl font-bold text-gray-800">{user?.level || 1}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-purple-100 to-purple-200">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-purple-600" />
-                  <div className="flex-1">
-                    <p className="text-xs text-gray-600">{t.xp}</p>
-                    <p className="text-2xl font-bold text-gray-800">{user?.totalXp || 0}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-yellow-100 to-yellow-200">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-yellow-600" />
-                  <div className="flex-1">
-                    <p className="text-xs text-gray-600">{t.coins}</p>
-                    <p className="text-2xl font-bold text-gray-800">{user?.coins || 0}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-pink-100 to-pink-200">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-pink-600" />
-                  <div className="flex-1">
-                    <p className="text-xs text-gray-600">{t.achievements}</p>
-                    <p className="text-2xl font-bold text-gray-800">0</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* XP Progress to Next Level */}
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-600">Progress to Level {(user?.level || 1) + 1}</p>
-              <p className="text-sm font-bold text-gray-800">{user?.totalXp || 0} / {((user?.level || 1) * 1000)} XP</p>
-            </div>
-            <Progress value={((user?.totalXp || 0) / ((user?.level || 1) * 1000)) * 100} className="h-3" />
           </div>
         </div>
       </header>
 
-      {/* Main Content - World Selector */}
-      <main className="container py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-black text-gray-800 mb-4">
+      {/* Progress Dashboard */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { icon: Zap, label: t.level, value: userLevel, color: '#00D9FF' },
+            { icon: Sparkles, label: t.xp, value: userXP, color: '#B026FF' },
+            { icon: Trophy, label: t.coins, value: userCoins, color: '#FFD700' },
+            { icon: Globe, label: t.achievements, value: userAchievements, color: '#FF0080' },
+          ].map((stat, index) => (
+            <Card 
+              key={index}
+              style={{ 
+                background: 'rgba(26, 10, 46, 0.6)', 
+                borderColor: stat.color,
+                boxShadow: `0 0 20px ${stat.color}30`
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <stat.icon className="w-10 h-10" style={{ color: stat.color, filter: `drop-shadow(0 0 8px ${stat.color})` }} />
+                  <div>
+                    <p className="text-sm" style={{ color: `${stat.color}CC` }}>{stat.label}</p>
+                    <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* XP Progress Bar */}
+        <div 
+          className="rounded-lg p-6 mb-8" 
+          style={{ 
+            background: 'rgba(26, 10, 46, 0.6)', 
+            border: '1px solid #00FF9F',
+            boxShadow: '0 0 20px rgba(0, 255, 159, 0.2)'
+          }}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span style={{ color: '#00FF9F' }}>{t.progressToLevel} {userLevel + 1}</span>
+            <span style={{ color: '#00FF9F' }}>{userXP} / {xpToNextLevel} XP</span>
+          </div>
+          <div 
+            className="h-4 rounded-full overflow-hidden" 
+            style={{ background: 'rgba(0, 255, 159, 0.2)' }}
+          >
+            <div
+              className="h-full transition-all duration-500"
+              style={{
+                width: `${xpProgress}%`,
+                background: 'linear-gradient(90deg, #00FF9F 0%, #00D9FF 100%)',
+                boxShadow: '0 0 10px #00FF9F'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* World Selection */}
+        <div className="mb-8">
+          <h2 
+            className="text-4xl font-black text-center mb-4 neon-text" 
+            style={{ color: '#00D9FF', textShadow: '0 0 20px #00D9FF' }}
+          >
             {t.selectWorld}
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            {language === "en" 
-              ? "Choose your adventure and start mastering English through epic quests and challenges!"
-              : "¡Elige tu aventura y comienza a dominar el inglés a través de misiones épicas y desafíos!"}
+          <p 
+            className="text-center text-lg mb-8" 
+            style={{ color: '#B026FF' }}
+          >
+            {t.chooseAdventure}
           </p>
-        </div>
 
-        {/* Worlds Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {WORLDS.map((world, index) => {
-            const isLocked = index > 0; // For now, only first world is unlocked
-            
-            return (
-              <Link key={world.id} href={isLocked ? "#" : `/world/${world.id}`}>
-                <Card 
-                  className={`world-card relative overflow-hidden ${isLocked ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  style={{
-                    background: isLocked 
-                      ? 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)'
-                      : `linear-gradient(135deg, ${world.color} 0%, ${world.secondaryColor} 100%)`,
-                  }}
-                >
-                  <CardHeader>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-5xl animate-float">{world.emoji}</span>
-                      {isLocked ? (
-                        <Badge variant="secondary" className="bg-gray-700 text-white">
-                          🔒 {t.locked}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {WORLDS.map((world, index) => {
+              const isUnlocked = index === 0; // Only first world unlocked for now
+
+              return (
+                <Link key={world.id} href={isUnlocked ? `/world/${world.id}` : "#"}>
+                  <Card
+                    className="world-card cursor-pointer transition-all duration-300 hover:scale-105 relative overflow-hidden"
+                    style={{
+                      background: isUnlocked 
+                        ? `linear-gradient(135deg, ${world.color}20 0%, ${world.secondaryColor}10 100%)`
+                        : 'rgba(50, 50, 50, 0.3)',
+                      borderColor: isUnlocked ? world.color : '#444',
+                      boxShadow: isUnlocked 
+                        ? `0 0 20px ${world.color}40, inset 0 0 20px ${world.color}10`
+                        : 'none',
+                      opacity: isUnlocked ? 1 : 0.6,
+                    }}
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-5xl">{world.emoji}</span>
+                        <Badge
+                          style={{
+                            background: isUnlocked ? world.color : '#666',
+                            color: '#0a0a1a',
+                            boxShadow: isUnlocked ? `0 0 10px ${world.color}` : 'none'
+                          }}
+                        >
+                          {isUnlocked ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                              {t.unlocked}
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="w-3 h-3 mr-1" />
+                              {t.locked}
+                            </>
+                          )}
                         </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-green-600 text-white">
-                          ✅ {t.unlocked}
-                        </Badge>
-                      )}
-                    </div>
-                    <CardTitle className="text-white text-2xl font-black">
-                      {world.name}
-                    </CardTitle>
-                    <CardDescription className="text-white/90 font-semibold">
-                      {world.cefrLevel} • {world.difficulty}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-white/80 text-sm leading-relaxed mb-4">
-                      {language === "en" ? world.narrative : world.description}
-                    </p>
-                    
-                    {!isLocked && (
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs text-white/90">
-                          <span>Missions: 0/10</span>
-                          <span>0%</span>
-                        </div>
-                        <Progress value={0} className="h-2 bg-white/20" />
+                      </div>
+                      <CardTitle 
+                        className="text-xl font-bold" 
+                        style={{ color: isUnlocked ? world.color : '#888' }}
+                      >
+                        {world.name}
+                      </CardTitle>
+                      <CardDescription 
+                        style={{ color: isUnlocked ? world.secondaryColor : '#666' }}
+                      >
+                        {world.cefrLevel} • {world.difficulty}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p 
+                        className="text-sm line-clamp-3" 
+                        style={{ color: isUnlocked ? `${world.color}DD` : '#666' }}
+                      >
+                        {world.description}
+                      </p>
+                    </CardContent>
+
+                    {!isUnlocked && (
+                      <div 
+                        className="absolute inset-0 flex items-center justify-center backdrop-blur-sm"
+                        style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+                      >
+                        <Lock className="w-16 h-16" style={{ color: '#666' }} />
                       </div>
                     )}
-                    
-                    {isLocked && (
-                      <p className="text-white/70 text-xs italic">
-                        {language === "en" 
-                          ? "Complete previous worlds to unlock"
-                          : "Completa los mundos anteriores para desbloquear"}
-                      </p>
-                    )}
-                  </CardContent>
-                  
-                  {/* Decorative elements */}
-                  <div 
-                    className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-30"
-                    style={{ background: world.accentColor }}
-                  />
-                </Card>
-              </Link>
-            );
-          })}
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-
-        {/* Coming Soon Section */}
-        <div className="mt-16 text-center">
-          <Card className="bg-gradient-to-r from-purple-100 to-pink-100 border-2 border-dashed border-purple-300">
-            <CardHeader>
-              <CardTitle className="text-3xl font-black text-purple-800">
-                🎮 {t.comingSoon}
-              </CardTitle>
-              <CardDescription className="text-lg text-purple-700">
-                {language === "en"
-                  ? "More worlds, missions, and features are being crafted for your adventure!"
-                  : "¡Más mundos, misiones y características están siendo creados para tu aventura!"}
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

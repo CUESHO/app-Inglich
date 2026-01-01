@@ -1,6 +1,17 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, 
+  users, 
+  missionCompletions,
+  worldUnlocks,
+  achievements,
+  gameResults,
+  InsertMissionCompletion,
+  InsertWorldUnlock,
+  InsertAchievement,
+  InsertGameResult
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +100,232 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Progression and unlocking functions
+
+export async function getUserProgress(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return user.length > 0 ? user[0] : null;
+}
+
+export async function updateUserXP(userId: number, xpToAdd: number, coinsToAdd: number = 0) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const user = await getUserProgress(userId);
+  if (!user) return null;
+
+  const newTotalXp = (user.totalXp || 0) + xpToAdd;
+  const newCoins = (user.coins || 0) + coinsToAdd;
+  
+  // Calculate new level (every 1000 XP = 1 level)
+  const newLevel = Math.floor(newTotalXp / 1000) + 1;
+
+  await db.update(users)
+    .set({
+      totalXp: newTotalXp,
+      level: newLevel,
+      coins: newCoins,
+      lastActivityDate: new Date(),
+    })
+    .where(eq(users.id, userId));
+
+  return { totalXp: newTotalXp, level: newLevel, coins: newCoins };
+}
+
+export async function completeMission(data: InsertMissionCompletion) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Check if mission already completed
+  const existing = await db
+    .select()
+    .from(missionCompletions)
+    .where(
+      and(
+        eq(missionCompletions.userId, data.userId),
+        eq(missionCompletions.missionId, data.missionId)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Update best score if new score is better
+    if (data.bestScore && data.bestScore > (existing[0].bestScore || 0)) {
+      await db
+        .update(missionCompletions)
+        .set({
+          bestScore: data.bestScore,
+          attempts: (existing[0].attempts || 0) + 1,
+          updatedAt: new Date(),
+        })
+        .where(eq(missionCompletions.id, existing[0].id));
+    }
+    return existing[0];
+  }
+
+  // Insert new completion
+  await db.insert(missionCompletions).values({
+    ...data,
+    completed: true,
+    completedAt: new Date(),
+  });
+
+  // Update user XP
+  await updateUserXP(data.userId, data.xpEarned || 0, data.coinsEarned || 0);
+
+  return data;
+}
+
+export async function getCompletedMissions(userId: number, worldId?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const query = worldId
+    ? db
+        .select()
+        .from(missionCompletions)
+        .where(
+          and(
+            eq(missionCompletions.userId, userId),
+            eq(missionCompletions.worldId, worldId),
+            eq(missionCompletions.completed, true)
+          )
+        )
+    : db
+        .select()
+        .from(missionCompletions)
+        .where(
+          and(
+            eq(missionCompletions.userId, userId),
+            eq(missionCompletions.completed, true)
+          )
+        );
+
+  return await query;
+}
+
+export async function unlockWorld(userId: number, worldId: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Check if already unlocked
+  const existing = await db
+    .select()
+    .from(worldUnlocks)
+    .where(
+      and(
+        eq(worldUnlocks.userId, userId),
+        eq(worldUnlocks.worldId, worldId)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    return existing[0];
+  }
+
+  // Insert new unlock
+  const unlock: InsertWorldUnlock = {
+    userId,
+    worldId,
+    unlockedAt: new Date(),
+  };
+
+  await db.insert(worldUnlocks).values(unlock);
+  return unlock;
+}
+
+export async function getUnlockedWorlds(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const unlocks = await db
+    .select()
+    .from(worldUnlocks)
+    .where(eq(worldUnlocks.userId, userId));
+
+  return unlocks.map(u => u.worldId);
+}
+
+export async function checkAndUnlockNextWorld(userId: number, currentWorldId: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Get all completed missions for current world
+  const completedMissions = await getCompletedMissions(userId, currentWorldId);
+
+  // Check if all 10 missions are completed (each world has 10 missions)
+  if (completedMissions.length >= 10) {
+    // Determine next world based on order
+    const worldOrder = [
+      "foundation-realm",
+      "action-arena",
+      "experience-citadel",
+      "mastery-kingdom",
+      "eloquence-observatory",
+      "perfection-sanctum",
+      "pronunciation-theater",
+      "competence-nexus",
+    ];
+
+    const currentIndex = worldOrder.indexOf(currentWorldId);
+    if (currentIndex >= 0 && currentIndex < worldOrder.length - 1) {
+      const nextWorldId = worldOrder[currentIndex + 1];
+      return await unlockWorld(userId, nextWorldId);
+    }
+  }
+
+  return null;
+}
+
+export async function saveGameResult(data: InsertGameResult) {
+  const db = await getDb();
+  if (!db) return null;
+
+  await db.insert(gameResults).values(data);
+  return data;
+}
+
+export async function getUserAchievements(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(achievements)
+    .where(eq(achievements.userId, userId))
+    .orderBy(desc(achievements.unlockedAt));
+}
+
+export async function grantAchievement(data: InsertAchievement) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Check if achievement already exists
+  const existing = await db
+    .select()
+    .from(achievements)
+    .where(
+      and(
+        eq(achievements.userId, data.userId),
+        eq(achievements.achievementType, data.achievementType)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    return existing[0];
+  }
+
+  await db.insert(achievements).values(data);
+
+  // Award XP for achievement
+  if (data.xpReward) {
+    await updateUserXP(data.userId, data.xpReward);
+  }
+
+  return data;
+}

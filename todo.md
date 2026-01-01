@@ -82,3 +82,40 @@
 - Motivational tone with game metaphors
 - Emoji usage throughout
 - Responsive design for all devices
+
+
+## Mejoras Solicitadas - Iteración 2
+
+### Visual Redesign - Neon Theme
+- [x] Implement dark background with neon color scheme
+- [x] Update all world colors to vibrant neon palette
+- [x] Add glowing effects and cyberpunk aesthetic
+- [x] Update typography for better readability on dark background
+
+### Progression System
+- [x] Implement automatic level unlocking after mission completion
+- [x] Create database schema for user progress tracking
+- [x] Add difficulty scaling for each subsequent level
+- [ ] Increase content length and complexity per level (requires content expansion)
+- [x] Add validation to ensure mastery before progression
+
+### Localization - USA English / Mexico Spanish
+- [ ] Update all English content to USA English variants
+- [ ] Update all Spanish content to Mexico Spanish variants
+- [ ] Review idioms, expressions, and cultural references
+
+### Minigame Fixes
+- [ ] Fix text-construction minigame with proper drag-and-drop
+- [ ] Implement visual feedback for word placement
+- [ ] Add validation for correct sentence structure
+
+### Voice Pronunciation Feedback
+- [ ] Add voice recording component to course pages
+- [ ] Integrate real-time pronunciation analysis
+- [ ] Display pronunciation feedback with visual indicators
+- [ ] Add practice mode for each content block
+
+### Pronunciation Display
+- [ ] Replace IPA symbols with written phonetic pronunciation
+- [ ] Use simple, readable phonetic notation (e.g., "HEH-loh" instead of /həˈloʊ/)
+- [ ] Ensure visual clarity and attractiveness

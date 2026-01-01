@@ -226,6 +226,63 @@ Analyze the pronunciation and provide feedback.`;
         }
       }),
   }),
+
+  // Progress and unlocking procedures
+  progress: router({
+    getMyProgress: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserProgress, getUnlockedWorlds, getUserAchievements } = await import('./db');
+      const progress = await getUserProgress(ctx.user.id);
+      const unlockedWorlds = await getUnlockedWorlds(ctx.user.id);
+      const userAchievements = await getUserAchievements(ctx.user.id);
+      
+      return {
+        level: progress?.level || 1,
+        totalXp: progress?.totalXp || 0,
+        coins: progress?.coins || 0,
+        achievements: userAchievements.length,
+        unlockedWorlds,
+      };
+    }),
+
+    completeMission: protectedProcedure
+      .input(z.object({
+        missionId: z.string(),
+        worldId: z.string(),
+        score: z.number(),
+        xpEarned: z.number(),
+        coinsEarned: z.number().default(0),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { completeMission, checkAndUnlockNextWorld } = await import('./db');
+        
+        const completion = await completeMission({
+          userId: ctx.user.id,
+          missionId: input.missionId,
+          worldId: input.worldId,
+          bestScore: input.score,
+          xpEarned: input.xpEarned,
+          coinsEarned: input.coinsEarned,
+          attempts: 1,
+        });
+
+        // Check if next world should be unlocked
+        const nextWorldUnlock = await checkAndUnlockNextWorld(ctx.user.id, input.worldId);
+
+        return {
+          completion,
+          nextWorldUnlocked: nextWorldUnlock ? true : false,
+        };
+      }),
+
+    getCompletedMissions: protectedProcedure
+      .input(z.object({
+        worldId: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getCompletedMissions } = await import('./db');
+        return await getCompletedMissions(ctx.user.id, input.worldId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

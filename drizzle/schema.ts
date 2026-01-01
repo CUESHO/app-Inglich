@@ -34,15 +34,16 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
- * User progress tracking for missions
+ * Mission completions table for tracking which missions the user has completed
  */
-export const userProgress = mysqlTable("userProgress", {
+export const missionCompletions = mysqlTable("missionCompletions", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
   missionId: varchar("missionId", { length: 64 }).notNull(),
   worldId: varchar("worldId", { length: 64 }).notNull(),
   completed: boolean("completed").default(false).notNull(),
   xpEarned: int("xpEarned").default(0).notNull(),
+  coinsEarned: int("coinsEarned").default(0).notNull(),
   attempts: int("attempts").default(0).notNull(),
   bestScore: int("bestScore").default(0).notNull(),
   completedAt: timestamp("completedAt"),
@@ -50,8 +51,21 @@ export const userProgress = mysqlTable("userProgress", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
-export type UserProgress = typeof userProgress.$inferSelect;
-export type InsertUserProgress = typeof userProgress.$inferInsert;
+export type MissionCompletion = typeof missionCompletions.$inferSelect;
+export type InsertMissionCompletion = typeof missionCompletions.$inferInsert;
+
+/**
+ * World unlocks table for tracking which worlds are available to the user
+ */
+export const worldUnlocks = mysqlTable("worldUnlocks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  worldId: varchar("worldId", { length: 64 }).notNull(),
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+});
+
+export type WorldUnlock = typeof worldUnlocks.$inferSelect;
+export type InsertWorldUnlock = typeof worldUnlocks.$inferInsert;
 
 /**
  * Achievements and medals
