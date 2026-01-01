@@ -296,3 +296,15 @@
 - [x] Pronunciation-practice minigame already interactive with voice recording
 - [x] Test all minigames across different blocks and missions
 - [x] Ensure mobile-friendly touch interactions
+
+
+## Bug Reportado - Iteración 13
+
+### Text-Construction Minigame Not Using Drag-and-Drop Component
+- [x] Fix text-construction minigame to use TextConstructionGame component instead of simplified version
+- [x] Ensure drag-and-drop functionality works correctly
+- [x] Verify all minigames function correctly:
+  - [x] Matching minigame (working perfectly with interactive pair selection)
+  - [x] Text-construction minigame (drag-and-drop rendering correctly)
+  - [x] Dialogue-choice minigame (already interactive)
+  - [x] Pronunciation-practice minigame (already interactive with voice recording)
