@@ -43,6 +43,12 @@
 }
 
 :root {
+  /* Gamification Colors */
+  --color-xp-bar: oklch(0.72 0.20 142);
+  --color-gold: oklch(0.75 0.15 85);
+  --color-silver: oklch(0.80 0.01 264);
+  --color-bronze: oklch(0.60 0.12 40);
+  
   --primary: var(--color-blue-700);
   --primary-foreground: var(--color-blue-50);
   --sidebar-primary: var(--color-blue-600);
@@ -173,5 +179,60 @@
       padding-right: 2rem;
       max-width: 1280px; /* Standard content width */
     }
+  }
+  
+  /* Gamification utilities */
+  .world-card {
+    @apply rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer;
+  }
+  
+  .mission-card {
+    @apply rounded-lg shadow-md transition-all duration-200 hover:shadow-lg cursor-pointer;
+  }
+  
+  .xp-bar {
+    @apply h-3 rounded-full overflow-hidden;
+    background: linear-gradient(90deg, var(--color-xp-bar) 0%, oklch(0.80 0.18 142) 100%);
+  }
+  
+  .difficulty-star {
+    @apply inline-block text-yellow-400;
+  }
+  
+  .game-button {
+    @apply px-6 py-3 rounded-lg font-bold text-lg transition-all duration-200 hover:scale-105 active:scale-95;
+  }
+  
+  .narrative-text {
+    @apply text-lg leading-relaxed text-muted-foreground;
+  }
+  
+  /* Animation utilities */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
   }
 }
