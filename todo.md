@@ -224,3 +224,26 @@
 - [x] Update contentGenerator.ts to generate valid matching game structure
 - [x] Update validation in MissionCourse.tsx for matching games
 - [x] Test matching games to ensure they work correctly
+
+
+## Mejoras Solicitadas - Iteración 9
+
+### Block Completion Checklist & Validation System
+- [x] Create visual checklist component that appears when user completes a block
+- [x] Track quiz answers and calculate percentage of correct responses
+- [x] Implement 70% threshold validation for block completion
+- [x] Block access to next block if user doesn't achieve 70% correct answers
+- [x] Allow retry of current block until 70% threshold is met
+- [x] Unlock next mission only when current mission blocks are completed with +70%
+- [x] Show progress feedback (e.g., "8/10 correct - 80% - Block Unlocked!")
+- [x] Add visual indicators for locked/unlocked blocks based on performance
+- [x] Track minigame completion in addition to quiz answers
+- [x] Include minigames in total activity count for percentage calculation
+- [x] Call onComplete callback for all minigame types (matching, text-construction, dialogue-choice, pronunciation-practice)
+
+### Auto-Hide Navigation Panel
+- [x] Implement scroll detection in MissionCourse component
+- [x] Hide "Back to Missions" button when user scrolls down
+- [x] Show "Back to Missions" button when user scrolls up
+- [x] Add smooth transition animations for show/hide
+- [x] Ensure button remains accessible on mobile devices

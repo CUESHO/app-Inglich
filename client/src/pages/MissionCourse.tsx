@@ -8,10 +8,11 @@ import { getMissionById, getWorldById } from "@shared/worlds";
 import { getCourseByMissionId } from "@shared/courseContent";
 import { Link, useParams } from "wouter";
 import { ArrowLeft, ArrowRight, Trophy, Zap, Clock, BookOpen, Gamepad2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Streamdown } from "streamdown";
 import TextConstructionGame from "@/components/TextConstructionGame";
 import VoicePracticeRecorder from "@/components/VoicePracticeRecorder";
+import BlockCompletionChecklist from "@/components/BlockCompletionChecklist";
 import { trpc } from "@/lib/trpc";
 
 export default function MissionCourse() {
@@ -20,6 +21,33 @@ export default function MissionCourse() {
   const [language, setLanguage] = useState<"en" | "es">("en");
   const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
   const [completedBlocks, setCompletedBlocks] = useState<Set<number>>(new Set());
+  const [blockScores, setBlockScores] = useState<Map<number, { correct: number; total: number }>>(new Map());
+  const [showChecklist, setShowChecklist] = useState(false);
+  const [currentBlockScore, setCurrentBlockScore] = useState({ correct: 0, total: 0 });
+  const [minigameCompleted, setMinigameCompleted] = useState(false);
+  const [showBackButton, setShowBackButton] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  
+  // Auto-hide navigation on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down
+        setShowBackButton(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setShowBackButton(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const mission = missionId ? getMissionById(missionId) : undefined;
   const world = mission ? getWorldById(mission.worldId) : undefined;
@@ -106,15 +134,66 @@ export default function MissionCourse() {
   const finalCourse = course || (missionId ? getCourseByMissionId(missionId) : null);
 
   const handleCompleteBlock = () => {
-    setCompletedBlocks(prev => new Set(prev).add(currentBlockIndex));
-    if (finalCourse && currentBlockIndex < finalCourse.blocks.length - 1) {
-      setCurrentBlockIndex(currentBlockIndex + 1);
+    // Calculate total activities: quiz questions + minigame (if present)
+    const hasMinigame = currentBlock.minigame ? 1 : 0;
+    const totalActivities = currentBlockScore.total + hasMinigame;
+    const correctActivities = currentBlockScore.correct + (minigameCompleted ? 1 : 0);
+    
+    const percentage = totalActivities > 0 ? (correctActivities / totalActivities) * 100 : 0;
+    
+    // Update score to include minigame
+    const finalScore = {
+      correct: correctActivities,
+      total: totalActivities
+    };
+    
+    // Save score for this block
+    setBlockScores(prev => {
+      const newScores = new Map(prev);
+      newScores.set(currentBlockIndex, finalScore);
+      return newScores;
+    });
+    
+    // Update current block score for display
+    setCurrentBlockScore(finalScore);
+    
+    // Show checklist
+    setShowChecklist(true);
+    
+    // Only mark as completed if score >= 70%
+    if (percentage >= 70) {
+      setCompletedBlocks(prev => new Set(prev).add(currentBlockIndex));
     }
+  };
+  
+  const handleContinueAfterChecklist = () => {
+    setShowChecklist(false);
+    const percentage = currentBlockScore.total > 0 ? (currentBlockScore.correct / currentBlockScore.total) * 100 : 0;
+    
+    if (percentage >= 70 && finalCourse && currentBlockIndex < finalCourse.blocks.length - 1) {
+      // Move to next block
+      setCurrentBlockIndex(currentBlockIndex + 1);
+      setCurrentBlockScore({ correct: 0, total: 0 });
+      setMinigameCompleted(false);
+    } else if (percentage < 70) {
+      // Reset current block score for retry
+      setCurrentBlockScore({ correct: 0, total: 0 });
+      setMinigameCompleted(false);
+    }
+  };
+  
+  const handleQuizAnswer = (isCorrect: boolean) => {
+    setCurrentBlockScore(prev => ({
+      correct: prev.correct + (isCorrect ? 1 : 0),
+      total: prev.total + 1
+    }));
   };
 
   const handleNextBlock = () => {
     if (finalCourse && currentBlockIndex < finalCourse.blocks.length - 1) {
       setCurrentBlockIndex(currentBlockIndex + 1);
+      setCurrentBlockScore({ correct: 0, total: 0 });
+      setMinigameCompleted(false);
     }
   };
 
@@ -177,7 +256,11 @@ export default function MissionCourse() {
       }}
     >
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+      <header 
+        className={`bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky z-50 transition-all duration-300 ${
+          showBackButton ? 'top-0' : '-top-24'
+        }`}
+      >
         <div className="container py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -315,6 +398,7 @@ export default function MissionCourse() {
                   minigame={currentBlock.minigame} 
                   worldColor={world.color}
                   translations={t}
+                  onComplete={() => setMinigameCompleted(true)}
                 />
               </CardContent>
             </Card>
@@ -342,6 +426,7 @@ export default function MissionCourse() {
                   questions={currentBlock.quiz} 
                   worldColor={world.accentColor}
                   translations={t}
+                  onAnswer={handleQuizAnswer}
                 />
               </CardContent>
             </Card>
@@ -388,18 +473,32 @@ export default function MissionCourse() {
           </div>
         </div>
       </main>
+      
+      {/* Block Completion Checklist Modal */}
+      {showChecklist && (
+        <BlockCompletionChecklist
+          correct={currentBlockScore.correct}
+          total={currentBlockScore.total}
+          worldColor={world?.color || '#00f0ff'}
+          onContinue={handleContinueAfterChecklist}
+          language={language}
+        />
+      )}
     </div>
   );
 }
 
 // Minigame Renderer Component
-function MinigameRenderer({ minigame, worldColor, translations }: any) {
+function MinigameRenderer({ minigame, worldColor, translations, onComplete }: any) {
   const [userAnswer, setUserAnswer] = useState<any>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
   const handleSubmit = () => {
     // Simple check for now - will be enhanced later
     setIsCorrect(true);
+    if (onComplete) {
+      onComplete();
+    }
   };
 
   if (minigame.type === "matching") {
@@ -438,14 +537,15 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
             </div>
           ))}
         </div>
-        <Button 
-          onClick={handleSubmit}
-          className="w-full"
-          style={{ backgroundColor: worldColor, color: 'white' }}
-        >
-          {translations.submit}
-        </Button>
-        {isCorrect !== null && (
+        {isCorrect === null ? (
+          <Button 
+            onClick={handleSubmit}
+            className="w-full"
+            style={{ backgroundColor: worldColor, color: 'white' }}
+          >
+            {translations.submit}
+          </Button>
+        ) : (
           <div className={`p-4 rounded-lg ${isCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
             <p className="font-bold">{isCorrect ? translations.correct : translations.incorrect}</p>
             <p className="text-sm">+{minigame.xpReward} {translations.xpEarned}</p>
@@ -474,6 +574,9 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
           if (isCorrect) {
             // Award XP
             console.log(`Awarded ${minigame.xpReward} XP`);
+            if (onComplete) {
+              onComplete();
+            }
           }
         }}
       />
@@ -506,7 +609,11 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
               className="w-full text-left justify-start h-auto py-4"
               onClick={() => {
                 setUserAnswer(index);
-                setIsCorrect(minigame.data.correctAnswers.includes(index));
+                const correct = minigame.data.correctAnswers.includes(index);
+                setIsCorrect(correct);
+                if (correct && onComplete) {
+                  onComplete();
+                }
               }}
             >
               <span className="font-bold mr-2">{String.fromCharCode(65 + index)})</span>
@@ -541,6 +648,9 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
         onComplete={(score) => {
           setIsCorrect(score >= 70);
           console.log(`Pronunciation score: ${score}`);
+          if (score >= 70 && onComplete) {
+            onComplete();
+          }
         }}
       />
     );
@@ -554,7 +664,7 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
 }
 
 // Quiz Renderer Component
-function QuizRenderer({ questions, worldColor, translations }: any) {
+function QuizRenderer({ questions, worldColor, translations, onAnswer }: any) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -570,8 +680,13 @@ function QuizRenderer({ questions, worldColor, translations }: any) {
 
   const handleSubmit = () => {
     setIsAnswered(true);
-    if (selectedAnswer === currentQuestion.correctAnswer) {
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    if (isCorrect) {
       setScore(score + currentQuestion.xpReward);
+    }
+    // Notify parent component about the answer
+    if (onAnswer) {
+      onAnswer(isCorrect);
     }
   };
 
