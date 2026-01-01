@@ -119,3 +119,17 @@
 - [ ] Replace IPA symbols with written phonetic pronunciation
 - [ ] Use simple, readable phonetic notation (e.g., "HEH-loh" instead of /həˈloʊ/)
 - [ ] Ensure visual clarity and attractiveness
+
+
+## Mejoras Solicitadas - Iteración 3
+
+### Drag-and-Drop Text Construction Minigame
+- [x] Install @dnd-kit/core and @dnd-kit/sortable dependencies
+- [x] Create TextConstructionGame component with drag-and-drop functionality
+- [x] Implement word bank with draggable words
+- [x] Implement drop zones for sentence construction
+- [x] Add validation logic to check correct sentence order
+- [x] Add visual feedback (correct/incorrect highlighting)
+- [x] Add sound effects or animations for success/failure
+- [x] Integrate component into MissionCourse.tsx
+- [x] Test with various sentence structures

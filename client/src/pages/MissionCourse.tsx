@@ -10,6 +10,7 @@ import { Link, useParams } from "wouter";
 import { ArrowLeft, ArrowRight, Trophy, Zap, Clock, BookOpen, Gamepad2 } from "lucide-react";
 import { useState } from "react";
 import { Streamdown } from "streamdown";
+import TextConstructionGame from "@/components/TextConstructionGame";
 
 export default function MissionCourse() {
   const { missionId } = useParams<{ missionId: string }>();
@@ -382,29 +383,19 @@ function MinigameRenderer({ minigame, worldColor, translations }: any) {
 
   if (minigame.type === "text-construction") {
     return (
-      <div className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {minigame.data.words.map((word: string, index: number) => (
-            <Badge 
-              key={index} 
-              variant="outline" 
-              className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-            >
-              {word}
-            </Badge>
-          ))}
-        </div>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[100px]">
-          <p className="text-gray-400 text-center">Drag words here to build your sentence</p>
-        </div>
-        <Button 
-          onClick={handleSubmit}
-          className="w-full"
-          style={{ backgroundColor: worldColor, color: 'white' }}
-        >
-          {translations.submit}
-        </Button>
-      </div>
+      <TextConstructionGame
+        question={minigame.data.question}
+        words={minigame.data.words}
+        correctOrder={minigame.data.correctOrder}
+        neonColor={worldColor}
+        onComplete={(isCorrect) => {
+          setIsCorrect(isCorrect);
+          if (isCorrect) {
+            // Award XP
+            console.log(`Awarded ${minigame.xpReward} XP`);
+          }
+        }}
+      />
     );
   }
 
