@@ -493,6 +493,12 @@ function MinigameRenderer({ minigame, worldColor, translations, onComplete }: an
   const [userAnswer, setUserAnswer] = useState<any>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
+  // Reset minigame state when minigame changes (new block)
+  useEffect(() => {
+    setUserAnswer(null);
+    setIsCorrect(null);
+  }, [minigame]);
+
   const handleSubmit = () => {
     // Simple check for now - will be enhanced later
     setIsCorrect(true);
@@ -669,6 +675,14 @@ function QuizRenderer({ questions, worldColor, translations, onAnswer }: any) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
+
+  // Reset quiz state when questions change (new block)
+  useEffect(() => {
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setIsAnswered(false);
+    setScore(0);
+  }, [questions]);
 
   const currentQuestion = questions[currentQuestionIndex];
 

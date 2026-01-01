@@ -262,3 +262,13 @@
 - [x] Fix text visibility on light pink/red backgrounds (error messages, feedback)
 - [x] Ensure sufficient color contrast for all text elements
 - [x] Update feedback message styling for better readability
+
+
+## Bug Reportado - Iteración 11
+
+### Persistent Quiz/Minigame Answers Across Blocks
+- [x] Investigate why previous answers persist when restarting from block 2
+- [x] Identify where quiz/minigame state is stored (localStorage, component state, etc.)
+- [x] Clear quiz answers when navigating to a new block
+- [x] Clear minigame state when navigating to a new block
+- [x] Test navigation flow: complete block 1 → go to block 2 → return to block 1 (should be reset)
