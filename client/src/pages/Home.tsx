@@ -6,6 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { getLoginUrl } from "@/const";
 import { WORLDS } from "@shared/worlds";
 import { Link } from "wouter";
+import { ShoppingBag } from "lucide-react";
+import DailyStreakWidget from "@/components/DailyStreakWidget";
 import { Sparkles, Trophy, Zap, Globe, Lock, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
@@ -249,18 +251,31 @@ export default function Home() {
                 >
                   🇺🇸
                 </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLanguage("es")}
+                style={{
+                  background: language === "es" ? '#FF008020' : 'transparent',
+                  color: language === "es" ? '#FF0080' : '#666',
+                  border: language === "es" ? '1px solid #FF0080' : 'none'
+                }}
+              >
+                🇲🇽
+              </Button>
+              <Link href="/shop">
                 <Button
                   variant="ghost"
-                  size="sm"
-                  onClick={() => setLanguage("es")}
                   style={{
-                    background: language === "es" ? '#FF008020' : 'transparent',
-                    color: language === "es" ? '#FF0080' : '#666',
-                    border: language === "es" ? '1px solid #FF0080' : 'none'
+                    color: '#FFD700',
+                    border: '1px solid #FFD700',
+                    boxShadow: '0 0 10px #FFD70040'
                   }}
                 >
-                  🇲🇽
+                  <ShoppingBag className="w-4 h-4 mr-2" />
+                  {language === 'en' ? 'Shop' : 'Tienda'}
                 </Button>
+              </Link>
               </div>
             </div>
           </div>
@@ -339,9 +354,16 @@ export default function Home() {
           >
             {t.chooseAdventure}
           </p>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {WORLDS.map((world, index) => {
+        {/* Daily Streak Widget */}
+        <div className="mb-8 max-w-md mx-auto">
+          <DailyStreakWidget language={language} />
+        </div>
+
+        {/* Worlds Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {WORLDS.map((world, index) => {
               const isUnlocked = unlockedWorlds.includes(world.id);
 
               return (
@@ -415,7 +437,6 @@ export default function Home() {
                 </Link>
               );
             })}
-          </div>
         </div>
       </div>
     </div>

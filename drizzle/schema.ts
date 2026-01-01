@@ -137,3 +137,73 @@ export const pronunciationRecordings = mysqlTable("pronunciationRecordings", {
 
 export type PronunciationRecording = typeof pronunciationRecordings.$inferSelect;
 export type InsertPronunciationRecording = typeof pronunciationRecordings.$inferInsert;
+
+/**
+ * Shop items available for purchase
+ */
+export const shopItems = mysqlTable("shopItems", {
+  id: int("id").autoincrement().primaryKey(),
+  itemType: mysqlEnum("itemType", ["hint", "xp_multiplier", "avatar", "world_unlock", "streak_freeze"]).notNull(),
+  name: varchar("name", { length: 128 }).notNull(),
+  description: text("description"),
+  coinCost: int("coinCost").notNull(),
+  duration: int("duration"), // For temporary items like XP multipliers (in minutes)
+  multiplier: int("multiplier"), // For XP multipliers (e.g., 2x, 3x)
+  imageUrl: varchar("imageUrl", { length: 512 }),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ShopItem = typeof shopItems.$inferSelect;
+export type InsertShopItem = typeof shopItems.$inferInsert;
+
+/**
+ * User purchases from the shop
+ */
+export const userPurchases = mysqlTable("userPurchases", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  itemId: int("itemId").notNull(),
+  itemType: varchar("itemType", { length: 64 }).notNull(),
+  coinsCost: int("coinsCost").notNull(),
+  purchasedAt: timestamp("purchasedAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"), // For temporary items
+  isActive: boolean("isActive").default(true).notNull(),
+  usedAt: timestamp("usedAt"),
+});
+
+export type UserPurchase = typeof userPurchases.$inferSelect;
+export type InsertUserPurchase = typeof userPurchases.$inferInsert;
+
+/**
+ * Daily streak tracking
+ */
+export const dailyStreaks = mysqlTable("dailyStreaks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  currentStreak: int("currentStreak").default(0).notNull(),
+  longestStreak: int("longestStreak").default(0).notNull(),
+  lastCheckIn: timestamp("lastCheckIn"),
+  streakFreezeUsed: boolean("streakFreezeUsed").default(false).notNull(),
+  totalCheckIns: int("totalCheckIns").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DailyStreak = typeof dailyStreaks.$inferSelect;
+export type InsertDailyStreak = typeof dailyStreaks.$inferInsert;
+
+/**
+ * Streak rewards claimed by users
+ */
+export const streakRewards = mysqlTable("streakRewards", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  streakDay: int("streakDay").notNull(), // Day of streak when reward was claimed
+  rewardType: varchar("rewardType", { length: 64 }).notNull(), // "coins", "xp", "power_up"
+  rewardAmount: int("rewardAmount"),
+  claimedAt: timestamp("claimedAt").defaultNow().notNull(),
+});
+
+export type StreakReward = typeof streakRewards.$inferSelect;
+export type InsertStreakReward = typeof streakRewards.$inferInsert;

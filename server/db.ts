@@ -329,3 +329,176 @@ export async function grantAchievement(data: InsertAchievement) {
 
   return data;
 }
+
+// Shop functions
+export async function updateUserCoins(userId: number, amount: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (user.length === 0) return null;
+
+  const newCoins = Math.max(0, (user[0].coins || 0) + amount);
+  
+  await db
+    .update(users)
+    .set({ coins: newCoins })
+    .where(eq(users.id, userId));
+
+  return newCoins;
+}
+
+export async function createPurchase(data: {
+  userId: number;
+  itemId: string;
+  itemType: string;
+  coinsCost: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const { userPurchases } = await import("../drizzle/schema");
+
+  await db.insert(userPurchases).values({
+    userId: data.userId,
+    itemId: 0, // Will be updated when we have proper shop items
+    itemType: data.itemType,
+    coinsCost: data.coinsCost,
+    isActive: true,
+  });
+
+  return data;
+}
+
+export async function getUserPurchases(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { userPurchases } = await import("../drizzle/schema");
+
+  return await db
+    .select()
+    .from(userPurchases)
+    .where(eq(userPurchases.userId, userId))
+    .orderBy(desc(userPurchases.purchasedAt));
+}
+
+// Daily streak functions
+export async function checkInDaily(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const { dailyStreaks } = await import("../drizzle/schema");
+
+  // Get or create streak record
+  let streak = await db
+    .select()
+    .from(dailyStreaks)
+    .where(eq(dailyStreaks.userId, userId))
+    .limit(1);
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  if (streak.length === 0) {
+    // Create new streak
+    await db.insert(dailyStreaks).values({
+      userId,
+      currentStreak: 1,
+      longestStreak: 1,
+      lastCheckIn: now,
+      totalCheckIns: 1,
+    });
+
+    // Award coins for first check-in
+    await updateUserCoins(userId, 10);
+
+    return { currentStreak: 1, reward: 10 };
+  }
+
+  const lastCheckIn = streak[0].lastCheckIn;
+  if (!lastCheckIn) {
+    // First check-in
+    await db
+      .update(dailyStreaks)
+      .set({
+        currentStreak: 1,
+        longestStreak: 1,
+        lastCheckIn: now,
+        totalCheckIns: 1,
+      })
+      .where(eq(dailyStreaks.userId, userId));
+
+    await updateUserCoins(userId, 10);
+    return { currentStreak: 1, reward: 10 };
+  }
+
+  const lastCheckInDate = new Date(
+    lastCheckIn.getFullYear(),
+    lastCheckIn.getMonth(),
+    lastCheckIn.getDate()
+  );
+
+  // Check if already checked in today
+  if (lastCheckInDate.getTime() === today.getTime()) {
+    return { currentStreak: streak[0].currentStreak, reward: 0, alreadyCheckedIn: true };
+  }
+
+  // Check if streak continues (yesterday)
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  let newStreak: number;
+  if (lastCheckInDate.getTime() === yesterday.getTime()) {
+    // Continue streak
+    newStreak = streak[0].currentStreak + 1;
+  } else {
+    // Streak broken, reset to 1
+    newStreak = 1;
+  }
+
+  const newLongestStreak = Math.max(newStreak, streak[0].longestStreak);
+  const newTotalCheckIns = streak[0].totalCheckIns + 1;
+
+  // Calculate reward based on streak
+  const reward = Math.min(10 + newStreak * 2, 50); // Max 50 coins per day
+
+  await db
+    .update(dailyStreaks)
+    .set({
+      currentStreak: newStreak,
+      longestStreak: newLongestStreak,
+      lastCheckIn: now,
+      totalCheckIns: newTotalCheckIns,
+    })
+    .where(eq(dailyStreaks.userId, userId));
+
+  // Award coins
+  await updateUserCoins(userId, reward);
+
+  return { currentStreak: newStreak, reward, isNewRecord: newStreak === newLongestStreak };
+}
+
+export async function getUserStreak(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const { dailyStreaks } = await import("../drizzle/schema");
+
+  const streak = await db
+    .select()
+    .from(dailyStreaks)
+    .where(eq(dailyStreaks.userId, userId))
+    .limit(1);
+
+  if (streak.length === 0) {
+    return {
+      currentStreak: 0,
+      longestStreak: 0,
+      totalCheckIns: 0,
+      lastCheckIn: null,
+    };
+  }
+
+  return streak[0];
+}

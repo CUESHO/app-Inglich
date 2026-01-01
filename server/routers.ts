@@ -325,6 +325,54 @@ Analyze the pronunciation and provide feedback.`;
       }),
   }),
 
+  // Streak procedures
+  streak: router({
+    getMyStreak: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserStreak } = await import('./db');
+      return await getUserStreak(ctx.user.id);
+    }),
+
+    checkIn: protectedProcedure.mutation(async ({ ctx }) => {
+      const { checkInDaily } = await import('./db');
+      return await checkInDaily(ctx.user.id);
+    }),
+  }),
+
+  // Shop procedures
+  shop: router({
+    purchaseItem: protectedProcedure
+      .input(z.object({
+        itemId: z.string(),
+        itemType: z.string(),
+        coinsCost: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getUserProgress, updateUserCoins, createPurchase } = await import('./db');
+        
+        // Check if user has enough coins
+        const progress = await getUserProgress(ctx.user.id);
+        if (!progress || progress.coins < input.coinsCost) {
+          throw new Error('Not enough coins');
+        }
+
+        // Deduct coins and create purchase
+        await updateUserCoins(ctx.user.id, -input.coinsCost);
+        await createPurchase({
+          userId: ctx.user.id,
+          itemId: input.itemId,
+          itemType: input.itemType,
+          coinsCost: input.coinsCost,
+        });
+
+        return { success: true };
+      }),
+
+    getUserPurchases: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserPurchases } = await import('./db');
+      return await getUserPurchases(ctx.user.id);
+    }),
+  }),
+
   // Content generation procedures
   content: router({
     generateMissionContent: protectedProcedure
