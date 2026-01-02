@@ -342,3 +342,16 @@
 - [ ] Fix the minigame to work correctly
 - [ ] Test all blocks to ensure no other minigames are broken
 - [ ] Save checkpoint for deployment with all fixes
+
+
+## Mejora Solicitada - Iteración 16
+
+### Reset Block Functionality on Retry
+- [x] Implement complete block reset when user clicks "Retry This Block" after failing
+- [x] Clear all quiz answers and reset quiz state to question 1
+- [x] Reset all minigame states (matching, text-construction, dialogue-choice, pronunciation)
+- [x] Clear completion tracking (completedActivities array)
+- [x] Reset score to 0
+- [x] Add blockResetKey state that increments on retry
+- [x] Add key props to MinigameRenderer and QuizRenderer to force component remount
+- [x] Test complete flow: fail block → click Retry → all states reset → can retry from scratch

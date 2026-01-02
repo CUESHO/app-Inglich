@@ -28,6 +28,7 @@ export default function MissionCourse() {
   const [minigameCompleted, setMinigameCompleted] = useState(false);
   const [showBackButton, setShowBackButton] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [blockResetKey, setBlockResetKey] = useState(0);
   
   // Auto-hide navigation on scroll
   useEffect(() => {
@@ -180,6 +181,8 @@ export default function MissionCourse() {
       // Reset current block score for retry
       setCurrentBlockScore({ correct: 0, total: 0 });
       setMinigameCompleted(false);
+      // Force complete reset of all components by changing key
+      setBlockResetKey(prev => prev + 1);
     }
   };
   
@@ -396,6 +399,7 @@ export default function MissionCourse() {
               </CardHeader>
               <CardContent className="pt-6">
                 <MinigameRenderer 
+                  key={`minigame-${currentBlockIndex}-${blockResetKey}`}
                   minigame={currentBlock.minigame} 
                   worldColor={world.color}
                   translations={t}
@@ -424,6 +428,7 @@ export default function MissionCourse() {
               </CardHeader>
               <CardContent className="pt-6">
                 <QuizRenderer 
+                  key={`quiz-${currentBlockIndex}-${blockResetKey}`}
                   questions={currentBlock.quiz} 
                   worldColor={world.accentColor}
                   translations={t}
