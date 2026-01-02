@@ -308,3 +308,37 @@
   - [x] Text-construction minigame (drag-and-drop rendering correctly)
   - [x] Dialogue-choice minigame (already interactive)
   - [x] Pronunciation-practice minigame (already interactive with voice recording)
+
+
+## Bug Reportado - Iteración 14
+
+### Text-Construction Drag-and-Drop Not Working Properly
+- [x] Fix drop zone in TextConstructionGame - words can be dragged but don't stick to the construction area
+- [x] Investigate handleDragEnd logic in TextConstructionGame component
+- [x] Verify droppable area is configured correctly
+- [x] Create DroppableArea component using useDroppable hook
+- [x] Update handleDragEnd to detect drops on drop-zone and word-bank correctly
+- [ ] Test complete drag-and-drop flow: drag word → drop in zone → word appears in construction area
+- [ ] Ensure dropped words can be removed and returned to word bank
+
+
+## Bug Reportado - Iteración 15
+
+### Text-Construction Word Insertion Order Issue
+- [x] Fix word insertion order in text-construction minigame
+- [x] When dragging third word, it inserts in second position instead of third
+- [x] Modify handleDragEnd to always append words to the end of dropZone array
+- [x] Remove automatic insertion logic that interferes with natural order
+- [x] Test complete flow: drag word 1 → position 1, drag word 2 → position 2, drag word 3 → position 3
+- [x] Verified in preview that words now append to end instead of inserting in middle
+- [x] Ready for user testing and deployment
+
+
+## Bug Reportado - Iteración 16
+
+### Minigame Not Working in Block 3
+- [ ] Navigate to Block 3 and identify which minigame is failing
+- [ ] Investigate the cause of the failure (data structure, rendering, logic)
+- [ ] Fix the minigame to work correctly
+- [ ] Test all blocks to ensure no other minigames are broken
+- [ ] Save checkpoint for deployment with all fixes

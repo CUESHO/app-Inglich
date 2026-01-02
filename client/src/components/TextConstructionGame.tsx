@@ -8,6 +8,7 @@ import {
   useSensor,
   useSensors,
   closestCenter,
+  useDroppable,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -19,6 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { CheckCircle2, XCircle, RotateCcw, Sparkles } from "lucide-react";
+import { DroppableArea } from "./DroppableArea";
 
 interface TextConstructionGameProps {
   question: string;
@@ -116,14 +118,17 @@ export default function TextConstructionGame({
     const activeWord = active.id as string;
     const isFromWordBank = wordBank.includes(activeWord);
     const isFromDropZone = dropZone.includes(activeWord);
+    const overIsDropZone = over.id === "drop-zone" || dropZone.includes(over.id as string);
+    const overIsWordBank = over.id === "word-bank" || wordBank.includes(over.id as string);
 
     // Moving from word bank to drop zone
-    if (isFromWordBank && over.id === "drop-zone") {
+    if (isFromWordBank && overIsDropZone) {
       setWordBank(wordBank.filter((w) => w !== activeWord));
+      // Always append to the end when dragging from word bank
       setDropZone([...dropZone, activeWord]);
     }
     // Moving from drop zone back to word bank
-    else if (isFromDropZone && over.id === "word-bank") {
+    else if (isFromDropZone && overIsWordBank) {
       setDropZone(dropZone.filter((w) => w !== activeWord));
       setWordBank([...wordBank, activeWord]);
     }
@@ -189,27 +194,28 @@ export default function TextConstructionGame({
           <h4 className="text-lg font-semibold mb-3" style={{ color: neonColor }}>
             Your Answer:
           </h4>
-          <SortableContext items={dropZone} strategy={verticalListSortingStrategy}>
-            <div
-              id="drop-zone"
-              className="min-h-[120px] p-6 rounded-lg flex flex-wrap gap-3 items-center justify-center transition-all duration-300"
-              style={{
-                background: dropZone.length > 0
-                  ? `linear-gradient(135deg, ${neonColor}15 0%, ${neonColor}08 100%)`
-                  : "rgba(255, 255, 255, 0.05)",
-                border: `2px dashed ${neonColor}${dropZone.length > 0 ? "" : "40"}`,
-                boxShadow: dropZone.length > 0 ? `0 0 25px ${neonColor}30` : "none",
-              }}
-            >
-              {dropZone.length === 0 ? (
-                <p className="text-gray-500 italic">Drag words here to build your sentence...</p>
-              ) : (
-                dropZone.map((word) => (
-                  <DraggableWord key={word} id={word} word={word} neonColor={neonColor} isInDropZone={true} />
-                ))
-              )}
-            </div>
-          </SortableContext>
+          <DroppableArea id="drop-zone">
+            <SortableContext items={dropZone} strategy={verticalListSortingStrategy}>
+              <div
+                className="min-h-[120px] p-6 rounded-lg flex flex-wrap gap-3 items-center justify-center transition-all duration-300"
+                style={{
+                  background: dropZone.length > 0
+                    ? `linear-gradient(135deg, ${neonColor}15 0%, ${neonColor}08 100%)`
+                    : "rgba(255, 255, 255, 0.05)",
+                  border: `2px dashed ${neonColor}${dropZone.length > 0 ? "" : "40"}`,
+                  boxShadow: dropZone.length > 0 ? `0 0 25px ${neonColor}30` : "none",
+                }}
+              >
+                {dropZone.length === 0 ? (
+                  <p className="text-gray-500 italic">Drag words here to build your sentence...</p>
+                ) : (
+                  dropZone.map((word) => (
+                    <DraggableWord key={word} id={word} word={word} neonColor={neonColor} isInDropZone={true} />
+                  ))
+                )}
+              </div>
+            </SortableContext>
+          </DroppableArea>
         </div>
 
         {/* Word Bank */}
@@ -217,24 +223,25 @@ export default function TextConstructionGame({
           <h4 className="text-lg font-semibold mb-3" style={{ color: neonColor }}>
             Word Bank:
           </h4>
-          <SortableContext items={wordBank} strategy={verticalListSortingStrategy}>
-            <div
-              id="word-bank"
-              className="min-h-[100px] p-6 rounded-lg flex flex-wrap gap-3 items-center justify-center"
-              style={{
-                background: "rgba(255, 255, 255, 0.03)",
-                border: `1px solid ${neonColor}30`,
-              }}
-            >
-              {wordBank.length === 0 ? (
-                <p className="text-gray-500 italic">All words used!</p>
-              ) : (
-                wordBank.map((word) => (
-                  <DraggableWord key={word} id={word} word={word} neonColor={neonColor} isInDropZone={false} />
-                ))
-              )}
-            </div>
-          </SortableContext>
+          <DroppableArea id="word-bank">
+            <SortableContext items={wordBank} strategy={verticalListSortingStrategy}>
+              <div
+                className="min-h-[100px] p-6 rounded-lg flex flex-wrap gap-3 items-center justify-center"
+                style={{
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: `1px solid ${neonColor}30`,
+                }}
+              >
+                {wordBank.length === 0 ? (
+                  <p className="text-gray-500 italic">All words used!</p>
+                ) : (
+                  wordBank.map((word) => (
+                    <DraggableWord key={word} id={word} word={word} neonColor={neonColor} isInDropZone={false} />
+                  ))
+                )}
+              </div>
+            </SortableContext>
+          </DroppableArea>
         </div>
 
         {/* Feedback */}
