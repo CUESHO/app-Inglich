@@ -1,0 +1,84 @@
+{
+  "project_info": {
+    "title": "Transformando el Aprendizaje de Inglés en una Experiencia Móvil",
+    "created": 1772403455.687673,
+    "last_updated": 1772403746.4369535,
+    "total_slides": 6
+  },
+  "slides": [
+    {
+      "id": "intro_slide",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "tech_stack_slide",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "architecture_slide",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "design_slide",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "connectivity_slide",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "roadmap_slide",
+      "state": "edited",
+      "pageNum": 6
+    }
+  ],
+  "outline": [
+    {
+      "id": "intro_slide",
+      "title": "Transformando el Aprendizaje de Inglés en una Experiencia Móvil",
+      "summary": "Introducción a la evolución de Fast English de web a Android, destacando la retención del usuario y la experiencia gamificada.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "tech_stack_slide",
+      "title": "React Native con Expo es la Solución Óptima para Fast English",
+      "summary": "Explicación de por qué React Native y Expo son las mejores opciones, enfocándose en la reutilización de código y el desarrollo ágil.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "architecture_slide",
+      "title": "Arquitectura Modular para una Escalabilidad Sin Fisuras",
+      "summary": "Detalle de la estructura técnica: separación de capas, navegación con React Navigation y gestión de estado con Zustand.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "design_slide",
+      "title": "Diseño Visual \"Aventurero\" Adaptado a Pantallas Táctiles",
+      "summary": "Enfoque en la interactividad táctil, paleta de colores sólida y optimización de recursos para móviles.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "connectivity_slide",
+      "title": "Conectividad Type-Safe con tRPC y Backend Node.js",
+      "summary": "Descripción de la comunicación segura entre el cliente móvil y el servidor, incluyendo autenticación y persistencia de datos.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "roadmap_slide",
+      "title": "Hoja de Ruta: Del Desarrollo a la Google Play Store",
+      "summary": "Pasos finales desde el desarrollo y QA hasta el lanzamiento y mantenimiento en la tienda de aplicaciones.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}

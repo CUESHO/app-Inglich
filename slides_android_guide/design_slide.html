@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box}
+      html,body{height:100%;margin:0;background:#FFFFFF}
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        display: flex;
+        background-color: #FFFFFF;
+        font-family: 'Montserrat', sans-serif;
+        color: #1E3A8A;
+        overflow: hidden;
+      }
+      .side-accent {
+        flex: 1;
+        background-color: #1E3A8A;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .main-content {
+        flex: 2;
+        padding-top: 80px; /* must keep upper padding for title */
+        padding-left: 60px;
+        padding-right: 60px;
+        background-color: #E0F2FE;
+        position: relative;
+      }
+      .title {
+        font-family: 'Playfair Display', serif;
+        font-size: 56px;
+        font-weight: 900;
+        line-height: 1.2;
+        margin-bottom: 30px; /* reduced to save vertical space */
+        color: #1E3A8A;
+      }
+      .design-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px; /* reduced gap to tighten rows */
+        align-items: start;
+      }
+      .design-item {
+        display: flex;
+        align-items: flex-start;
+      }
+      .design-icon {
+        width: 56px;
+        height: 56px;
+        background-color: #D97706;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px; /* slightly reduced */
+        flex-shrink: 0;
+      }
+      .design-icon i { font-size: 30px; color: #FFFFFF; }
+      .design-text h3 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px; /* tightened */
+        color: #1E3A8A;
+      }
+      .design-text p {
+        font-size: 18px;
+        line-height: 1.5;
+        color: #1E3A8A;
+        margin: 0;
+      }
+      .circle-mask {
+        width: 220px; /* reduced slightly */
+        height: 220px;
+        background-color: #D97706;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        z-index: 1;
+      }
+      .circle-mask i { font-size: 110px; color: #FFFFFF; }
+      .dotted-line {
+        position: absolute;
+        border-left: 4px dotted #D97706;
+        height: calc(100% - 40px);
+        left: 50%;
+        top: 20px;
+        transform: translateX(-50%);
+        z-index: 0;
+      }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="side-accent">
+            <div class="dotted-line"></div>
+            <div class="circle-mask">
+                <i class="fas fa-palette"></i>
+            </div>
+        </div>
+        <div class="main-content">
+            <h2 class="title">Diseño Visual "Aventurero" Adaptado a Pantallas Táctiles</h2>
+            <div class="design-grid">
+                <div class="design-item">
+                    <div class="design-icon"><i class="fas fa-fingerprint"></i></div>
+                    <div class="design-text">
+                        <h3>Interactividad Táctil</h3>
+                        <p>Botones y elementos de juego rediseñados para una respuesta táctil inmediata y precisa en dispositivos móviles.</p>
+                    </div>
+                </div>
+                <div class="design-item">
+                    <div class="design-icon"><i class="fas fa-fill-drip"></i></div>
+                    <div class="design-text">
+                        <h3>Colores Sólidos</h3>
+                        <p>Uso de colores profundos y sólidos para mejorar la legibilidad y el contraste en diversas condiciones de iluminación.</p>
+                    </div>
+                </div>
+                <div class="design-item" style="grid-column: 1 / -1;">
+                    <div class="design-icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                    <div class="design-text">
+                        <h3>Optimización de Assets</h3>
+                        <p>Imágenes y animaciones comprimidas para garantizar tiempos de carga mínimos y un rendimiento fluido en Android.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
